@@ -10,6 +10,21 @@ import { apiRouter } from './routes.js';
 initDb();
 
 const app = express();
+
+// CORS: la app empaquetada con Capacitor corre en un origen distinto
+// (capacitor://localhost), así que el API debe aceptar peticiones
+// cross-origin (navegador/WebView la bloquearía si no).
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  if (req.method === 'OPTIONS') {
+    res.sendStatus(204);
+    return;
+  }
+  next();
+});
+
 app.use(express.json());
 
 // API bajo /api

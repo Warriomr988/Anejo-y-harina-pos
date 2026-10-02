@@ -5,8 +5,9 @@
 //     configuró en Ajustes → "Dirección del servidor".
 //  2. `import.meta.env.VITE_API_URL` — variable de entorno en compilación
 //     (útil para apuntar a un servidor fijo en el APK).
-//  3. Si la app corre empaquetada con Capacitor (`capacitor://`), el origen
-//     propio no sirve: se usa `http://localhost:3001` por defecto.
+//  3. Si la app corre empaquetada con Capacitor, el origen propio no sirve:
+//     se usa `http://localhost:3001` por defecto. Capacitor 5+ sirve desde
+//     `https://localhost` (no `capacitor:`), así que se detectan ambos.
 //  4. En web normal (navegador / Termux) se usan rutas relativas (mismo
 //     origen), que el proxy de Vite o Express resuelven.
 //
@@ -28,7 +29,12 @@ export function getServerUrl(): string {
   if (env?.VITE_API_URL && env.VITE_API_URL.trim()) {
     return env.VITE_API_URL.trim().replace(/\/+$/, '');
   }
-  if (window.location.protocol === 'capacitor:') return 'http://localhost:3001';
+  const protocol = window.location.protocol;
+  const hostname = window.location.hostname;
+  const isCapacitor =
+    protocol === 'capacitor:' ||
+    (protocol === 'https:' && (hostname === 'localhost' || hostname === '127.0.0.1'));
+  if (isCapacitor) return 'http://localhost:3001';
   return '';
 }
 

@@ -62,6 +62,18 @@ jobs:
           grep -q 'targetSdkVersion = 34' "$FILE"
           grep -q 'compileSdkVersion = 34' "$FILE"
 
+      - name: Permitir tráfico HTTP local (cleartext)
+        # La app habla con el servidor por http:// (p. ej. http://localhost:3001).
+        # Android 9+ bloquea ese tráfico por defecto; sin este permiso el
+        # WebView rechaza las peticiones con "Failed to fetch".
+        run: |
+          cd client
+          FILE=android/app/src/main/AndroidManifest.xml
+          sed -i 's/<application/<application android:usesCleartextTraffic="true"/' "$FILE"
+          echo "--- application tag ---"
+          grep -o '<application[^>]*>' "$FILE" | head -1
+          grep -q 'usesCleartextTraffic="true"' "$FILE"
+
       - name: Compilar el APK (debug)
         run: |
           cd client/android
