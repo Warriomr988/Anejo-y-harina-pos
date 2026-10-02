@@ -1,0 +1,1 @@
+{"description":"App de domicilios Añejo y Harina (Vite + React + Express + SQLite)","name":"restaurant-pos","private":true,"scripts":{"build:client":"npm --prefix client run build","dev:client":"npm --prefix client run dev","dev:server":"npm --prefix server run dev","install:all":"npm --prefix client install && npm --prefix server install"},"version":"0.1.0"}

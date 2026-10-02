@@ -1,0 +1,76 @@
+# Compila el APK de "Añejo y Harina" en la nube.
+#
+# Se ejecuta al hacer push a la rama `main` o manualmente desde la pestaña
+# Actions → "Compilar APK" → Run workflow.
+#
+# El APK solo empaqueta el frontend (client/dist). El servidor Express/SQLite
+# sigue corriendo aparte (p. ej. en Termux); la app se conecta a él con la
+# "Dirección del servidor" de Ajustes.
+#
+# Configuración Android: minSdk 33 (Android 13), targetSdk 34 (Android 14).
+# El APK es debug (firmado con la llave de depuración): se instala directo
+# en el teléfono permitiendo "instalar apps desconocidas".
+
+name: Compilar APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+
+      - name: Instalar Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+
+      - name: Instalar Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Instalar dependencias y compilar el frontend
+        run: |
+          cd client
+          npm ci
+          npm run build
+
+      - name: Generar el proyecto nativo Android
+        run: |
+          cd client
+          npx cap add android
+
+      - name: Fijar versiones del SDK (minSdk 33 / targetSdk 34)
+        run: |
+          cd client
+          FILE=android/variables.gradle
+          sed -i -E 's/minSdkVersion = [0-9]+/minSdkVersion = 33/' "$FILE"
+          sed -i -E 's/targetSdkVersion = [0-9]+/targetSdkVersion = 34/' "$FILE"
+          sed -i -E 's/compileSdkVersion = [0-9]+/compileSdkVersion = 34/' "$FILE"
+          echo "--- variables.gradle resultante ---"
+          grep -E 'minSdkVersion|targetSdkVersion|compileSdkVersion' "$FILE"
+          grep -q 'minSdkVersion = 33' "$FILE"
+          grep -q 'targetSdkVersion = 34' "$FILE"
+          grep -q 'compileSdkVersion = 34' "$FILE"
+
+      - name: Compilar el APK (debug)
+        run: |
+          cd client/android
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+
+      - name: Subir el APK como artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: anyejo-y-harina-apk
+          path: client/android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error

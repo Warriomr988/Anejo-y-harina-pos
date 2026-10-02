@@ -1,0 +1,22 @@
+# Dependencias instaladas
+node_modules/
+
+# Salidas de compilación
+dist/
+build/
+
+# Base de datos local de pruebas
+*.db
+*.db-journal
+
+# Variables de entorno
+.env
+.env.local
+
+# Capacitor / Android generado (se regenera con `npx cap add android`)
+client/android/
+client/ios/
+
+# Sistema / editores
+.DS_Store
+Thumbs.db
