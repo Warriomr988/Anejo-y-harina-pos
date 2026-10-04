@@ -1,12 +1,9 @@
-// Panel derecho "Resumen del pedido": tipo de pedido, líneas con cantidades,
-// nota, totales y botón para cobrar.
+// Panel derecho "Resumen del pedido": líneas con cantidades, mesa,
+// nota, totales y botón para cobrar. Todos los pedidos son en mesa.
 import DishVisual from './DishVisual';
 import {
-  DELIVERY_FEE,
-  ORDER_TYPES,
   formatPrice,
   type CartItem,
-  type OrderType,
 } from '../data/menu';
 
 interface Props {
@@ -15,8 +12,6 @@ interface Props {
   onNote: (note: string) => void;
   onQty: (dishId: string, delta: number) => void;
   onRemove: (dishId: string) => void;
-  orderType: OrderType;
-  onOrderType: (t: OrderType) => void;
   tableLabel: string;
   onTableLabel: (v: string) => void;
   onCheckout: () => void;
@@ -28,44 +23,26 @@ export default function OrderPanel({
   onNote,
   onQty,
   onRemove,
-  orderType,
-  onOrderType,
   tableLabel,
   onTableLabel,
   onCheckout,
 }: Props) {
   const subtotal = cart.reduce((s, i) => s + i.dish.price * i.qty, 0);
-  const deliveryFee = orderType === 'domicilio' && cart.length > 0 ? DELIVERY_FEE : 0;
-  const total = subtotal + deliveryFee;
+  const total = subtotal;
 
   return (
     <aside className="order-panel">
       <h2>Resumen del pedido</h2>
 
-      <div className="order-types" role="group" aria-label="Tipo de pedido">
-        {ORDER_TYPES.map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            className={`order-type${orderType === t.id ? ' active' : ''}`}
-            onClick={() => onOrderType(t.id)}
-          >
-            {t.name}
-          </button>
-        ))}
-      </div>
-
-      {orderType === 'mesa' && (
-        <label className="table-field">
-          <span>Mesa</span>
-          <input
-            type="text"
-            placeholder="Ej.: 5"
-            value={tableLabel}
-            onChange={(e) => onTableLabel(e.target.value)}
-          />
-        </label>
-      )}
+      <label className="table-field">
+        <span>Mesa</span>
+        <input
+          type="text"
+          placeholder="Ej.: 5"
+          value={tableLabel}
+          onChange={(e) => onTableLabel(e.target.value)}
+        />
+      </label>
 
       {cart.length === 0 ? (
         <div className="order-empty">
@@ -119,7 +96,7 @@ export default function OrderPanel({
         <span>Nota del pedido</span>
         <textarea
           rows={2}
-          placeholder="Ej.: el ají aparte, para llevar…"
+          placeholder="Ej.: el ají aparte…"
           value={note}
           onChange={(e) => onNote(e.target.value)}
         />
@@ -129,10 +106,6 @@ export default function OrderPanel({
         <div className="summary-row">
           <span>Subtotal</span>
           <span>{formatPrice(subtotal)}</span>
-        </div>
-        <div className="summary-row">
-          <span>Domicilio</span>
-          <span>{formatPrice(deliveryFee)}</span>
         </div>
         <div className="summary-row total">
           <span>Total</span>

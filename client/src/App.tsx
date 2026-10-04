@@ -16,11 +16,9 @@ import RegistroScreen from './components/RegistroScreen';
 import SettingsScreen from './components/SettingsScreen';
 import {
   CATEGORIES,
-  DELIVERY_FEE,
   MENU_DISHES,
   type CartItem,
   type Dish,
-  type OrderType,
   type TabId,
 } from './data/menu';
 
@@ -30,7 +28,6 @@ export default function App() {
   const [apiDown, setApiDown] = useState(false);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [note, setNote] = useState('');
-  const [orderType, setOrderType] = useState<OrderType>('domicilio');
   const [tableLabel, setTableLabel] = useState('');
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('todo');
@@ -70,7 +67,7 @@ export default function App() {
 
   const total = useMemo(() => {
     const subtotal = cart.reduce((s, i) => s + i.dish.price * i.qty, 0);
-    return subtotal; // el modal suma el domicilio según el tipo de pedido
+    return subtotal;
   }, [cart]);
 
   function addToCart(dish: Dish) {
@@ -191,8 +188,6 @@ export default function App() {
               onNote={setNote}
               onQty={changeQty}
               onRemove={removeItem}
-              orderType={orderType}
-              onOrderType={setOrderType}
               tableLabel={tableLabel}
               onTableLabel={setTableLabel}
               onCheckout={() => setCashOpen(true)}
@@ -221,8 +216,8 @@ export default function App() {
       {cashOpen && (
         <CashModal
           cart={cart}
-          total={total + (orderType === 'domicilio' && cart.length > 0 ? DELIVERY_FEE : 0)}
-          orderType={orderType}
+          total={total}
+          orderType="mesa"
           tableLabel={tableLabel}
           note={note}
           onClose={() => setCashOpen(false)}

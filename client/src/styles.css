@@ -1299,6 +1299,22 @@ body {
   }
 }
 
+/* En teléfonos angostos la cápsula muestra solo los iconos de las 6
+   pestañas (sin texto) para que no se amontonen las etiquetas. */
+@media (max-width: 520px) {
+  .mnav-label {
+    display: none;
+  }
+
+  .mnav-item {
+    padding: 9px 4px;
+  }
+
+  .mnav-icon {
+    font-size: 21px;
+  }
+}
+
 /* ============ Stepper de las tarjetas de producto (como la referencia) ============ */
 .product-actions .stepper {
   background: transparent;

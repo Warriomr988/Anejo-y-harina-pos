@@ -3,7 +3,6 @@ import { Router, type Request, type Response } from 'express';
 import { db } from './db.js';
 
 // Constantes de negocio (editables). Deben coincidir con el cliente.
-const DELIVERY_FEE = 4000; // recargo fijo por domicilio (pesos colombianos)
 
 const VALID_STATUS = ['borrador', 'confirmado', 'pagado', 'cancelado'] as const;
 type OrderStatus = (typeof VALID_STATUS)[number];
@@ -131,9 +130,9 @@ apiRouter.post('/orders', (req: Request, res: Response) => {
   }
 
   const discount = Math.min(Math.max(Number(body.discount) || 0, 0), subtotal);
-  // App de domicilios: todo pedido es a domicilio salvo indicación contraria.
-  const type = body.type === 'mesa' || body.type === 'llevar' ? body.type : 'domicilio';
-  const deliveryFee = type === 'domicilio' ? DELIVERY_FEE : 0;
+  // El terminal solo maneja pedidos en mesa (sin domicilios ni para llevar).
+  const type = 'mesa';
+  const deliveryFee = 0;
   // Los precios del menú ya incluyen impuestos: no se suma IVA aparte.
   const tax = 0;
   const total = subtotal - discount + deliveryFee + tax;

@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { getServerUrl, setServerUrl } from '../api';
 import {
   BILL_DENOMINATIONS,
-  DELIVERY_FEE,
   RESTAURANT_NAME,
   RESTAURANT_TAGLINE,
   formatPrice,
@@ -106,21 +105,6 @@ export default function SettingsScreen() {
             </span>
           ))}
         </div>
-      </section>
-
-      <section className="settings-card">
-        <h2>Domicilios</h2>
-        <dl className="settings-list">
-          <div>
-            <dt>Recargo por domicilio</dt>
-            <dd>{formatPrice(DELIVERY_FEE)}</dd>
-          </div>
-        </dl>
-        <p className="muted">
-          Se cobra solo en pedidos tipo «Domicilio». Editable en{' '}
-          <code>client/src/data/menu.ts</code> y <code>server/src/routes.ts</code> (deben
-          coincidir).
-        </p>
       </section>
 
       <section className="settings-card">

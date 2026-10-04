@@ -55,6 +55,8 @@ export default function MobileNav({ active, onChange, cartCount, onPedido }: Pro
             ref={setItemRef(item.id)}
             className={`mnav-item${active === item.id ? ' active' : ''}`}
             onClick={() => onChange(item.id)}
+            aria-label={item.label}
+            title={item.label}
           >
             <span className="mnav-icon" aria-hidden="true">
               {item.icon}
